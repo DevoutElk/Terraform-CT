@@ -1,81 +1,90 @@
-# DATOS SERVIDOR PROXMOX
+###############################################################################
+# CONEXIÓN A PROXMOX
+###############################################################################
 variable "pve_host" {
-  description = "Servidor Proxmox"
-  default     = "https://192.168.1.165:8006/api2/json"
+  description = "URL de la API de Proxmox"
 }
 
 variable "proxmox_host" {
-  default = "192.168.1.165"
+  description = "IP del servidor Proxmox (para conexiones SSH)"
 }
 
+variable "proxmox_node" {
+  description = "Nombre del nodo Proxmox"
+}
 
-# TOKEN DE CONEXIÓN
+###############################################################################
+# AUTENTICACIÓN PROXMOX
+###############################################################################
 variable "pve_token_id" {
-  description = "Token ID para conexión a Proxmox (ej: terraform@pve!terraform)"
+  description = "Token ID para conexión a la API (ej: terraform@pam!terraform)"
   type        = string
   sensitive   = true
-  default     = "terraform@pam!terraform"
 }
 
 variable "pve_secret" {
-  description = "Token Secret para conexión a Proxmox"
+  description = "Token Secret para conexión a la API de Proxmox"
   type        = string
   sensitive   = true
-  default     = "27e6e8bd-9c97-4a12-9c70-d2084ddc55f2"
 }
-
-# Nombre nodo proxmox
-
-variable "proxmox_node" {
-default = "pve"
-}
-
-
-# Contraseña terraform
 
 variable "proxmox_ssh_password" {
-  default   = "tamaolipas"
-  sensitive = true
-}
-
-#### Template CT
-
-variable "template_file" {
-  default = "debian-12-standard_12.12-1_amd64.tar.zst"
-}
-
-
-################################# Configuracion  CT LXC ###########################
-# CONTRASEÑA DEL USUARIO LINUX ROOT DEL CONTENEDOR LXC (opcional si usamos SSH keys)
-variable "ct_pass" {
-  description = "Contraseña root del contenedor LXC (opcional si usamos ssh_keys)"
+  description = "Contraseña SSH del usuario terraform en Proxmox"
   type        = string
   sensitive   = true
-  default     = "default"
 }
 
-# NOMBRE DEL CONTENEDOR LXC
-variable "hostname" {
-  default = "CTApache"
+###############################################################################
+# PLANTILLA LXC
+###############################################################################
+variable "template_file" {
+  description = "Nombre del fichero de plantilla LXC a descargar y usar"
 }
 
-# SERVIDOR DNS
+###############################################################################
+# RED
+###############################################################################
 variable "dns_server" {
-  default = "192.168.1.1"
+  description = "IP del servidor DNS"
 }
 
-
-# DOMINIO
 variable "dns_domain" {
-  default = "pve.home"
+  description = "Dominio de búsqueda DNS"
 }
 
-# DATOS SSH-KEY PARA ACCESO AL CONTENEDOR LXC
-#variable "ssh_key" {
-#  default = "ssh-rsa #AAAAB3NzaC1yc2EAAAADAQABAAAAgQDZhM/sCkAPITumaeIqMlUxlO/f1ZTpHcVgYqy+xYeZdU#hJg7qfWvOguzC00jmvJ73NiDzm9nIVIBh+492IrltP3G3xN8gyLSuhholKDROP/IjCp9msXeU0#.1cXI9zKlgJBKDUzin0B1INCHPQzx5wHS1Zpn69nqaMk7ak57Nu5NyQ=="
-#}
+###############################################################################
+# CONTENEDOR FRONTEND (VMID 200)
+###############################################################################
+variable "hostname1" {
+  description = "Hostname del contenedor Frontend"
+}
 
+variable "ct_pass1" {
+  description = "Contraseña root del contenedor Frontend"
+  type        = string
+  sensitive   = true
+}
 
+###############################################################################
+# CONTENEDOR BACKEND (VMID 300)
+###############################################################################
+variable "hostname2" {
+  description = "Hostname del contenedor Backend"
+}
 
+variable "ct_pass2" {
+  description = "Contraseña root del contenedor Backend"
+  type        = string
+  sensitive   = true
+}
 
+###############################################################################
+# IP & VMID's
+###############################################################################
 
+variable "ip_frontend"     { description = "IP pública del contenedor Frontend" }
+variable "ip_backend"      { description = "IP privada del contenedor Backend" }
+variable "ip_gateway_pub"  { description = "Gateway red pública" }
+variable "ip_gateway_priv" { description = "Gateway red privada (Frontend)" }
+variable "vmid_frontend"   { description = "VMID del contenedor Frontend" }
+variable "vmid_backend"    { description = "VMID del contenedor Backend" }
