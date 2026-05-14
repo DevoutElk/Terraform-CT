@@ -140,7 +140,7 @@ resource "null_resource" "install_ssh_frontend" {
     inline = [
       "sleep 10",  # espera a que el contenedor arranque completamente
       "sudo pct exec 200 -- apt update",
-      "sudo pct exec 200 -- apt install -y openssh-server",
+      "sudo pct exec 200 -- apt install openssh-server -y",
       "sudo pct exec 200 -- systemctl enable ssh",
       "sudo pct exec 200 -- systemctl start ssh",
       "sudo pct exec 200 -- sed -i 's/#PermitRootLogin.*/PermitRootLogin yes/' /etc/ssh/sshd_config",
@@ -171,7 +171,7 @@ resource "null_resource" "install_ssh_backend" {
     inline = [
       "sleep 10",  # espera a que el contenedor arranque completamente
       "sudo pct exec 300 -- apt update",
-      "sudo pct exec 300 -- DEBIAN_FRONTEND=noninteractive apt install -y openssh-server",
+      "sudo pct exec 300 -- DEBIAN_FRONTEND=noninteractive apt install openssh-server -y",
       "sudo pct exec 300 -- systemctl enable ssh",
       "sudo pct exec 300 -- systemctl start ssh",
       "sudo pct exec 300 -- sed -i 's/#PermitRootLogin.*/PermitRootLogin yes/' /etc/ssh/sshd_config",
