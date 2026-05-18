@@ -1,6 +1,5 @@
 ###############################################################################
-# PASO 1 - Descargar plantilla LXC en Proxmox
-# Se ejecuta primero. Ambas máquinas dependen de este paso.
+# Descargar plantilla LXC en Proxmox
 ###############################################################################
 resource "null_resource" "download_template" {
   connection {
@@ -23,11 +22,10 @@ resource "null_resource" "download_template" {
 
 
 ###############################################################################
-# PASO 2A - Crear contenedor Frontend (VMID 200)
+# Crear contenedor WEB (VMID 200)
 # Tiene interfaz pública (eth0/vmbr0) y privada (eth1/vmbr1)
-# Actúa como router/NAT para la red interna
 ###############################################################################
-resource "proxmox_lxc" "TERRAFORMTEST01" {
+resource "proxmox_lxc" "WEB_1" {
   depends_on   = [null_resource.download_template]
   count        = 1
   onboot       = true
@@ -53,7 +51,7 @@ resource "proxmox_lxc" "TERRAFORMTEST01" {
   nameserver   = var.dns_server
   searchdomain = var.dns_domain
 
-  # Interfaz pública - acceso desde red local
+  # Interfaz pública - acceso desde balanceador de carga
   network {
     name     = "eth0"
     bridge   = "vmbr0"
@@ -62,7 +60,7 @@ resource "proxmox_lxc" "TERRAFORMTEST01" {
     firewall = false
   }
 
-  # Interfaz privada - red interna entre contenedores
+  # Interfaz privada - red interna hacia Base de datos
   network {
     name     = "eth1"
     bridge   = "vmbr1"
@@ -77,11 +75,11 @@ resource "proxmox_lxc" "TERRAFORMTEST01" {
 
 
 ###############################################################################
-# PASO 2B - Crear contenedor Backend (VMID 300)
+# Crear contenedor Backend Base de datos (VMID 300)
 # Solo tiene interfaz privada (eth1/vmbr1)
-# Sale a internet a través del Frontend (172.16.0.2)
+# Sale a internet a través de (172.16.0.2)
 ###############################################################################
-resource "proxmox_lxc" "TERRAFORMTEST02" {
+resource "proxmox_lxc" "BD_1" {
   depends_on   = [null_resource.download_template]
   count        = 1
   onboot       = true
@@ -123,11 +121,11 @@ resource "proxmox_lxc" "TERRAFORMTEST02" {
 
 
 ###############################################################################
-# PASO 3A - Instalar SSH en Frontend via pct exec
+# Instalar SSH en la pagina web 
 # Se conecta a Proxmox y ejecuta comandos dentro del contenedor 200
 ###############################################################################
 resource "null_resource" "install_ssh_frontend" {
-  depends_on = [proxmox_lxc.TERRAFORMTEST01]
+  depends_on = [proxmox_lxc.WEB_1]
 
   connection {
     type     = "ssh"
@@ -152,12 +150,11 @@ resource "null_resource" "install_ssh_frontend" {
 
 
 ###############################################################################
-# PASO 3B - Instalar SSH en Backend via pct exec
+# Instalar SSH en la base de datos via pct exec
 # Se conecta a Proxmox y ejecuta comandos dentro del contenedor 300
-# Se ejecuta en paralelo con el paso 3A
 ###############################################################################
 resource "null_resource" "install_ssh_backend" {
-  depends_on = [proxmox_lxc.TERRAFORMTEST02,
+  depends_on = [proxmox_lxc.BD_1,
   null_resource.install_apache]
 
   connection {
