@@ -180,7 +180,32 @@ resource "null_resource" "install_ssh_backend" {
     ]
   }
 }
+#######################
+# Install apache
+#######################
 
+resource "null_resource" "enable_nat" {
+  depends_on = [null_resource.install_ssh_frontend]
+
+  connection {
+    type     = "ssh"
+    user     = "root"
+    password = var.ct_pass1
+    host     = "192.168.1.166"
+  }
+
+  provisioner "file" {
+    source      = "scripts/enable_nat.sh"
+    destination = "/tmp/enable_nat.sh"
+  }
+
+  provisioner "remote-exec" {
+    inline = [
+      "chmod +x /tmp/enable_nat.sh",
+      "bash /tmp/enable_nat.sh"
+    ]
+  }
+}
 
 ###############################################################################
 # PASO 4A - Configurar Frontend: Apache2 + NAT/iptables
