@@ -3,7 +3,7 @@
 <h3>Descipcion</h3>
 <p>
   Utilizando proxmox creamos una infresturcutra con la siguiente arquitectura
-  <img width="2019" height="535" alt="IMG-20260518-WA0014" src="https://github.com/user-attachments/assets/67e4fe4e-23f6-455c-b022-8e181737ebee" />
+ <img width="1921" height="499" alt="image" src="https://github.com/user-attachments/assets/00ef181a-b392-4c1f-9df8-1989dec797e4" />
   Consta de 2 maquinas con servidor web con una base de datos comun y luego un balanceador de carga apuntando a las maquinas web todo esto creado con LXC en un srv proxmox.
 </p>
 
